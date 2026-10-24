@@ -32,30 +32,36 @@ export default function BlogPage() {
     useEffect(() => {
         const fetchData = async () => {
             setIsLoading(true);
-            const [blogsData, settingsData] = await Promise.all([
-                client.fetch(
-                    groq`*[_type == "blog"] | order(publishedAt desc) {
-                        _id,
-                        title,
-                        slug,
-                        excerpt,
-                        category,
-                        featuredImage,
-                        publishedAt,
-                        readTime,
-                        author,
-                        featured
-                    }`
-                ),
-                client.fetch(
-                    groq`*[_type == "pageSettings"][0]{
-                        landingPages
-                    }`
-                )
-            ]);
-            setBlogs(blogsData);
-            setPageSettings(settingsData);
-            setIsLoading(false);
+            try {
+                const [blogsData, settingsData] = await Promise.all([
+                    client.fetch(
+                        groq`*[_type == "blog"] | order(publishedAt desc) {
+                            _id,
+                            title,
+                            slug,
+                            excerpt,
+                            category,
+                            featuredImage,
+                            publishedAt,
+                            readTime,
+                            author,
+                            featured
+                        }`
+                    ),
+                    client.fetch(
+                        groq`*[_type == "pageSettings"][0]{
+                            landingPages
+                        }`
+                    )
+                ]);
+                setBlogs(blogsData || []);
+                setPageSettings(settingsData || null);
+            } catch (err) {
+                console.warn("Failed to fetch blog posts:", err);
+                setBlogs([]);
+            } finally {
+                setIsLoading(false);
+            }
         };
         fetchData();
     }, []);

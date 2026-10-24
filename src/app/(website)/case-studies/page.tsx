@@ -42,31 +42,37 @@ export default function CaseStudiesPage() {
     useEffect(() => {
         const fetchData = async () => {
             setIsLoading(true);
-            const [caseStudiesData, settingsData] = await Promise.all([
-                client.fetch(
-                    groq`*[_type == "work"] | order(order asc) {
-                        _id,
-                        title,
-                        slug,
-                        category,
-                        industry,
-                        duration,
-                        featuredImage,
-                        results,
-                        challenge,
-                        solution,
-                        keyTactics
-                    }`
-                ),
-                client.fetch(
-                    groq`*[_type == "pageSettings"][0]{
-                        landingPages
-                    }`
-                )
-            ]);
-            setCaseStudies(caseStudiesData);
-            setPageSettings(settingsData);
-            setIsLoading(false);
+            try {
+                const [caseStudiesData, settingsData] = await Promise.all([
+                    client.fetch(
+                        groq`*[_type == "work"] | order(order asc) {
+                            _id,
+                            title,
+                            slug,
+                            category,
+                            industry,
+                            duration,
+                            featuredImage,
+                            results,
+                            challenge,
+                            solution,
+                            keyTactics
+                        }`
+                    ),
+                    client.fetch(
+                        groq`*[_type == "pageSettings"][0]{
+                            landingPages
+                        }`
+                    )
+                ]);
+                setCaseStudies(caseStudiesData || []);
+                setPageSettings(settingsData || null);
+            } catch (err) {
+                console.warn("Failed to fetch case studies:", err);
+                setCaseStudies([]);
+            } finally {
+                setIsLoading(false);
+            }
         };
 
         fetchData();

@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 };
 
 export default async function ServicesPage() {
-    const services = await getServices();
+    const services = (await getServices()) || [];
     const settings = await getPageSettings();
     const landingContent = settings?.landingPages?.servicesLanding;
 

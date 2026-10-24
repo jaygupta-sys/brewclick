@@ -65,11 +65,11 @@ const plugins = [
 ]
 
 export const config = defineConfig({
-    projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || "",
-    dataset: process.env.NEXT_PUBLIC_SANITY_DATASET || "",
-    title: process.env.NEXT_PUBLIC_WEBSITE_TITLE,
-    apiVersion: process.env.NEXT_PUBLIC_SANITY_API_V,
-    basePath: process.env.NEXT_PUBLIC_SANITY_STUDIO_URL,
+    projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || "placeholder",
+    dataset: process.env.NEXT_PUBLIC_SANITY_DATASET || "production",
+    title: process.env.NEXT_PUBLIC_WEBSITE_TITLE || "Brewclick Studio",
+    apiVersion: process.env.NEXT_PUBLIC_SANITY_API_V || "2024-01-01",
+    basePath: process.env.NEXT_PUBLIC_SANITY_STUDIO_URL || "/studio",
     plugins,
     schema: { types: schemas },
 })

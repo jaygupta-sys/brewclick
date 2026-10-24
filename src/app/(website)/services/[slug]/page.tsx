@@ -3,35 +3,50 @@ import { notFound } from "next/navigation";
 import MainComponent from "../../../../components/MainComponent";
 import { Metadata } from "next";
 
+export const dynamicParams = true;
+
 type Props = {
     params: Promise<{ slug: string }>;
 };
 
 export async function generateStaticParams() {
-    const services = await getServicePaths();
-    return services.map((service: any) => ({
-        slug: service.slug,
-    }));
+    try {
+        const services = await getServicePaths();
+        if (!Array.isArray(services)) return [];
+        return services
+            .filter((service: any) => service?.slug)
+            .map((service: any) => ({
+                slug: service.slug,
+            }));
+    } catch {
+        return [];
+    }
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-    const resolvedParams = await params;
-    const service = await getService(resolvedParams.slug);
+    try {
+        const resolvedParams = await params;
+        const service = await getService(resolvedParams.slug);
 
-    if (!service) {
+        if (!service) {
+            return {
+                title: "Services | Brewclick",
+            };
+        }
+
         return {
-            title: "Service Not Found",
+            title: service.seo?.title || `${service.title} | Brewclick`,
+            description: service.seo?.description || service.shortDescription,
+            openGraph: {
+                title: service.seo?.title || service.title,
+                description: service.seo?.description || service.shortDescription,
+            },
+        };
+    } catch {
+        return {
+            title: "Services | Brewclick",
         };
     }
-
-    return {
-        title: service.seo?.title || `${service.title} | Brewclick`,
-        description: service.seo?.description || service.shortDescription,
-        openGraph: {
-            title: service.seo?.title || service.title,
-            description: service.seo?.description || service.shortDescription,
-        },
-    };
 }
 
 export default async function ServicePage({ params }: Props) {
